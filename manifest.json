@@ -1,7 +1,7 @@
 {
   "id": "simple_music_recommender",
   "name": "简单音乐推荐插件",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "kind": "nonebot",
   "entry": "nonebot_plugin_simple_music",
   "integration_entry": "nonebot_plugin_simple_music.integration",
@@ -33,10 +33,10 @@
       ]
     },
     "simple_music_send_mode": {
-      "title": "歌曲发送方式",
+      "title": "默认歌曲发送方式",
       "type": "string",
       "default": "link",
-      "description": "默认提供歌名与播放链接，无需签名服务；卡片需要QQ消息适配器。",
+      "description": "普通调用沿用此方式；AI明确发卡片时可使用card。卡片需要QQ消息适配器。",
       "group": "开始使用",
       "enum": [
         "link",

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nonebot-plugin-simple-music"
-version = "1.1.0"
+version = "1.1.1"
 description = "网易云与QQ音乐搜索、卡片分享及播放链接"
 requires-python = ">=3.10"
 dependencies = ["nonebot2>=2.3,<3", "aiohttp>=3.10,<4"]

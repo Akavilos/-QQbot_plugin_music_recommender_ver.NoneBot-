@@ -18,8 +18,8 @@ class MusicService:
             lines.append(line)
         return '\n'.join(lines)
 
-    async def make_card(self,song):
-        mode=self.settings.send_mode
+    async def make_card(self,song,mode=None):
+        mode=mode or self.settings.send_mode
         if mode=='card':
             if song.source=='netease':return Card('music',{'type':'163','id':song.id})
             if not song.card_id.isdigit():raise MusicError('QQ音乐没有返回有效卡片编号，改用播放页面')
@@ -32,8 +32,13 @@ class MusicService:
                                  'content':song.artist,'image':cover})
         raise MusicError('当前发送方式不发送音乐卡片')
 
-    async def recommend(self,keyword,limit,send):
+    async def recommend(self,keyword,limit,send,*,delivery='configured'):
         if not self.settings.enable_tool:return '音乐搜索功能已关闭。'
+        if delivery not in ('configured','card','link'):return '发送方式应为 configured、card 或 link。'
+        mode=self.settings.send_mode
+        if delivery=='link':mode='link'
+        elif delivery=='card' and mode=='link':
+            mode='card_api' if self.settings.sign_api_url and self.settings.sign_api_key else 'card'
         if not isinstance(keyword,str) or not keyword.strip():return '请输入歌名、歌手或关键词。'
         keyword=keyword.strip()
         if len(keyword)>200:return '搜索关键词过长，请缩短到200字以内。'
@@ -47,11 +52,11 @@ class MusicService:
             return '音乐平台返回的歌曲数据格式发生变化，本次搜索未完成。'
         if not songs:return '没有找到匹配的歌曲。'
         listing=self.format_songs(songs)
-        if self.settings.send_mode=='link':return '我查到这些歌曲：\n'+listing
+        if mode=='link':return '我查到这些歌曲：\n'+listing
         sent=[];failed=[]
         for song in songs[:self.settings.card_count]:
             try:
-                card=await self.make_card(song)
+                card=await self.make_card(song,mode)
             except MusicError as error:
                 failed.append(song.title)
                 self.logger.warning(f'[音乐卡片] {error}')

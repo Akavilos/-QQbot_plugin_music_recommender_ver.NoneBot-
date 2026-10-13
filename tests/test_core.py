@@ -27,6 +27,33 @@ class Client(MusicClient):
     async def extras(self,song):return song.cover,'https://example.com/audio.mp3'
 
 class CoreTests(unittest.IsolatedAsyncioTestCase):
+    async def test_explicit_card_overrides_link_without_changing_configuration(self):
+        settings=Settings.from_mapping({})
+        service=MusicService(settings,Client(settings),Log());cards=[]
+        async def send(card):cards.append(card);return {'message_id':1}
+        text=await service.recommend('歌曲',1,send,delivery='card')
+        self.assertIn('确认发送 1 张',text);self.assertEqual(cards[0].kind,'music')
+        self.assertEqual(settings.send_mode,'link')
+        configured=Settings.from_mapping({'sign_api_url':'https://example.com/sign','sign_api_key':'fixture-signing-key'})
+        class SignedClient(Client):
+            async def request(self,method,url,**kwargs):
+                if url==self.settings.sign_api_url:
+                    self.calls.append((method,url,kwargs))
+                    return {'code':200,'data':{'app':'com.tencent.music.lua','view':'music','prompt':'歌曲甲',
+                        'meta':{'music':{'title':'歌曲甲','preview':kwargs['params']['cover'],'musicUrl':kwargs['params']['url']}}}}
+                return await super().request(method,url,**kwargs)
+        signed=MusicService(configured,SignedClient(configured),Log());cards.clear()
+        text=await signed.recommend('歌曲',1,send,delivery='card')
+        self.assertIn('确认发送 1 张',text);self.assertEqual(cards[0].kind,'json')
+        payload=cards[0].data['data']['meta']['music']
+        self.assertEqual(payload['preview'],'https://example.com/cover.jpg')
+        self.assertEqual(payload['musicUrl'],'https://example.com/audio.mp3')
+        self.assertNotIn('fixture-signing-key',json.dumps(cards[0].data))
+        count=len(signed.client.calls);cards.clear()
+        text=await signed.recommend('歌曲',1,send,delivery='link')
+        self.assertFalse(cards);self.assertEqual(len(signed.client.calls),count)
+        self.assertIn('查到这些歌曲',text)
+
     async def test_search_cache_limit_and_source(self):
         settings=Settings.from_mapping({});self.assertEqual(settings.send_mode,'link')
         client=Client(settings);songs=await client.search('歌曲',settings.limit())
