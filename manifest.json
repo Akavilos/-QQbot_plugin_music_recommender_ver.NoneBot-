@@ -1,0 +1,143 @@
+{
+  "id": "simple_music_recommender",
+  "name": "简单音乐推荐插件",
+  "version": "1.1.0",
+  "kind": "nonebot",
+  "entry": "nonebot_plugin_simple_music",
+  "integration_entry": "nonebot_plugin_simple_music.integration",
+  "description": "网易云与QQ音乐搜索、音乐卡片及播放链接。支持搜歌指令与AI工具接入。",
+  "requirements": [
+    "aiohttp>=3.10,<4"
+  ],
+  "schema": {
+    "simple_music_enable_tool": {
+      "title": "启用搜歌",
+      "type": "boolean",
+      "default": true,
+      "description": "同时控制搜歌指令和AI工具。",
+      "group": "开始使用"
+    },
+    "simple_music_music_source": {
+      "title": "搜索音乐的平台",
+      "type": "string",
+      "default": "netease",
+      "description": "选择网易云音乐或QQ音乐。",
+      "group": "开始使用",
+      "enum": [
+        "netease",
+        "qqmusic"
+      ],
+      "labels": [
+        "网易云音乐",
+        "QQ音乐"
+      ]
+    },
+    "simple_music_send_mode": {
+      "title": "歌曲发送方式",
+      "type": "string",
+      "default": "link",
+      "description": "默认提供歌名与播放链接，无需签名服务；卡片需要QQ消息适配器。",
+      "group": "开始使用",
+      "enum": [
+        "link",
+        "card",
+        "card_api",
+        "custom"
+      ],
+      "labels": [
+        "歌名与播放链接",
+        "机器人签名音乐卡片",
+        "独立签名音乐卡片",
+        "标准自定义卡片（实验）"
+      ]
+    },
+    "simple_music_default_limit": {
+      "title": "默认候选歌曲数",
+      "type": "integer",
+      "default": 3,
+      "description": "未指定数量时返回多少首歌。",
+      "group": "开始使用",
+      "minimum": 1,
+      "maximum": 20
+    },
+    "simple_music_card_count": {
+      "title": "每次最多发送的卡片数",
+      "type": "integer",
+      "default": 1,
+      "description": "仅影响卡片，不限制搜索候选数量。",
+      "group": "开始使用",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "simple_music_show_album": {
+      "title": "显示专辑",
+      "type": "boolean",
+      "default": true,
+      "description": "返回歌曲所属专辑。",
+      "group": "歌曲信息"
+    },
+    "simple_music_show_duration": {
+      "title": "显示时长",
+      "type": "boolean",
+      "default": true,
+      "description": "返回分钟与秒格式的时长。",
+      "group": "歌曲信息"
+    },
+    "simple_music_show_link": {
+      "title": "显示播放链接",
+      "type": "boolean",
+      "default": true,
+      "description": "通常保持开启，卡片不可用时也便于打开歌曲页面。",
+      "group": "歌曲信息"
+    },
+    "simple_music_search_timeout": {
+      "title": "请求最长等待（秒）",
+      "type": "integer",
+      "default": 10,
+      "description": "单次音乐接口请求的最长等待。",
+      "group": "搜索与缓存",
+      "minimum": 3,
+      "maximum": 30
+    },
+    "simple_music_max_results_hard_limit": {
+      "title": "候选歌曲数量上限",
+      "type": "integer",
+      "default": 8,
+      "description": "限制一次调用能请求的歌曲数。",
+      "group": "搜索与缓存",
+      "minimum": 1,
+      "maximum": 20
+    },
+    "simple_music_cache_seconds": {
+      "title": "相同搜索缓存（秒）",
+      "type": "integer",
+      "default": 120,
+      "description": "缓存只在本实例内存中；0关闭缓存，重启后清空。",
+      "group": "搜索与缓存",
+      "minimum": 0,
+      "maximum": 600
+    },
+    "simple_music_sign_api_url": {
+      "title": "签名服务HTTPS地址",
+      "type": "string",
+      "default": "",
+      "description": "只在独立签名卡片方式下使用，没有内置服务商。",
+      "group": "独立签名服务"
+    },
+    "simple_music_sign_api_key": {
+      "title": "签名服务密钥",
+      "type": "string",
+      "default": "",
+      "description": "由你使用的签名服务提供。",
+      "group": "独立签名服务",
+      "secret": true
+    },
+    "simple_music_sign_api_format": {
+      "title": "服务格式参数（可选）",
+      "type": "string",
+      "default": "",
+      "description": "通常留空，自动使用netease或qq。",
+      "group": "独立签名服务"
+    }
+  }
+}
